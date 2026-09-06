@@ -245,3 +245,22 @@ turns), alive render-wait animation (`app/render-wait.css`), upload thumbnails i
 (`app/memo.css`). Removed the artificial 2.6s `MIN_THINK_MS` floor (was for fixtures). Remaining
 latency is the plan call itself: claude-opus-5 at effort low, 6-25s per turn; `PLAN_MODEL`
 env var can switch to claude-sonnet-5 for roughly half that if Caroline wants.
+
+**16:20.** Plan model switched to **claude-sonnet-5** (`PLAN_MODEL` env on Vercel production and in
+`web/.env.local`), same images (gpt-image-2), same validator. Caroline asked why questions feel the
+same: the interviewer rules converge by design; suggested a prompt tweak (react to the last answer,
+vary order) rather than any JSON change.
+
+**16:35 — questions now come from the goal.** Caroline is demoing two journeys to the judges: a
+kitchen renovation and solar panels on a newly bought old house. The solar journey was asking the
+kitchen script (style, inspiration photo). Fix in `web/lib/prompt.ts` only: the interview list is
+derived from the goal (room redesign: space/bother/taste/budget/room photo; energy or solar:
+roof orientation and shading, roof type and age, heating, usage and EV, front-of-house photo
+from the street; anything else: invent the equivalent list, never taste unless the goal is about
+looks). Style questions and the inspiration upload are banned on energy journeys. Each question
+must react to the last answer; block ids and progress labels follow the goal ("Your roof").
+Solar render brief = same house, panels on the named slope; products = panels, inverter, battery,
+installer. Verified live: solar run asks roof → roof type → heating → usage → front photo; kitchen
+unchanged. Deployed 16:33, committed as 50a910b (prompt.ts only; page.tsx, Ctx.tsx,
+blocks/index.tsx from round seven are still uncommitted but already on prod). Untested: solar
+render turn with a real house photo; any third goal (extension, garden).

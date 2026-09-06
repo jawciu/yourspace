@@ -328,12 +328,14 @@ function ListAlternatives({ block }: BlockProps) {
 
 // ---- action.cta -------------------------------------------------------------------------
 function ActionCta({ block }: BlockProps) {
-  const { send, busy } = useApp();
+  const { send, busy, restart, designDone } = useApp();
   const p = block.props as P;
+  // On the design screen the quiet second action is always "New design": a fresh journey.
+  const secondary = designDone ? 'New design' : p.secondary;
   return (
     <div className="cta">
       <button className="btn-primary" disabled={busy} onClick={() => send(`${p.label}: done`)}>{p.label}</button>
-      {p.secondary ? <button className="btn-quiet" disabled={busy} onClick={() => send(p.secondary)}>{p.secondary}</button> : null}
+      {secondary ? <button className="btn-quiet" disabled={busy} onClick={() => (designDone ? restart() : send(secondary))}>{secondary}</button> : null}
     </div>
   );
 }

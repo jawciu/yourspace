@@ -174,7 +174,7 @@ export default function Page() {
 
   return (
     <MotionConfig reducedMotion="user">
-    <AppCtx.Provider value={{ persona, send, busy, composite, draft, setDraft, submitTurn, skipTurn }}>
+    <AppCtx.Provider value={{ persona, send, busy, composite, draft, setDraft, submitTurn, skipTurn , restart: clear, designDone: !!plan?.blocks.some(b => b.component === 'render.compare')}}>
       <div className={`shell ${showJson ? 'shell-json' : ''} ${plan ? 'shell-memo' : ''}`}>
         <header className="top">
           <button className="logo" onClick={clear} aria-label="Yourspace, start over"><img src="/yourspace.png" alt="Yourspace" className="logo-img" /></button>
