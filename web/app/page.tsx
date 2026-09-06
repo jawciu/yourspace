@@ -25,7 +25,7 @@ const FOLLOW_UPS: Record<string, string[]> = {
   'saved': ['The kitchen'],
 };
 const spring = { type: 'spring' as const, stiffness: 220, damping: 28, mass: 0.9 };
-const MIN_THINK_MS = 2600; // fixtures return instantly; the generating state must be seen
+const MIN_THINK_MS = 0; // no artificial floor: the model call is the only wait
 
 // What the system says it is doing while the plan is being made. Keyed by what was asked.
 function stepsFor(message: string, stage: string): string[] {

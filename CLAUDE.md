@@ -239,3 +239,9 @@ alive (Agent I: CSS-only in `app/render-wait.css`, light sweep, breathing blur, 
 caption, reduced-motion safe); (3) right panel shows thumbnails of uploads instead of ids (Agent J:
 page.tsx + `app/memo.css`, `uploadedPreviews` from blocks, hides "photo uploaded" memory rows).
 Imports for the two new css files are already in globals.css.
+
+**16:10 — deployed round seven.** Next outside the upload box (Renderer `.turn-actions` on room-photo
+turns), alive render-wait animation (`app/render-wait.css`), upload thumbnails in the right panel
+(`app/memo.css`). Removed the artificial 2.6s `MIN_THINK_MS` floor (was for fixtures). Remaining
+latency is the plan call itself: claude-opus-5 at effort low, 6-25s per turn; `PLAN_MODEL`
+env var can switch to claude-sonnet-5 for roughly half that if Caroline wants.
