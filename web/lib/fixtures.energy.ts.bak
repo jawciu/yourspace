@@ -1,0 +1,189 @@
+// Hand-written plans. Two jobs: the renderer is built against these before the model is wired
+// in, and they are the fallback when there is no API key or the model fails twice (M23).
+import type { UIPlan } from './validate';
+
+export const FIXTURES: Record<string, UIPlan> = {
+  // ---- meter reading ----------------------------------------------------------------------
+  'priya:meter': {
+    intent: 'Give a reading for both meters',
+    frame: 'focus',
+    blocks: [
+      { id: 'meter.electricity', component: 'meter.reading', intent_class: 'input', tier: 'hero', why: 'Your electricity has been estimated since 2 August', props: { fuel: 'electricity' } },
+      { id: 'meter.gas', component: 'meter.reading', intent_class: 'input', tier: 'primary', why: 'Gas too, same date, so both go in together', props: { fuel: 'gas' } },
+      { id: 'action.submit', component: 'action.cta', intent_class: 'action', tier: 'supporting', why: 'One tap sends both and fixes your next bill', props: { label: 'Send readings', target: 'meter.electricity' } },
+      { id: 'note.estimate', component: 'note.explain', intent_class: 'feedback', tier: 'ambient', why: 'So you know why we are asking', props: { text: 'Your last two bills were estimated. A real reading now will correct the balance on the next one.' } },
+    ],
+    primary_action: { block_id: 'action.submit', label: 'Send readings' },
+  },
+  'priya:meter:photo': {
+    intent: 'Give a reading for both meters',
+    frame: 'focus',
+    blocks: [
+      { id: 'meter.electricity', component: 'meter.reading', intent_class: 'input', tier: 'hero', why: 'Your electricity has been estimated since 2 August', props: { fuel: 'electricity' } },
+      { id: 'meter.gas', component: 'meter.reading', intent_class: 'input', tier: 'primary', why: 'A photo of the gas dial is fine, we will read it', props: { fuel: 'gas', mode: 'photo' } },
+      { id: 'action.submit', component: 'action.cta', intent_class: 'action', tier: 'supporting', why: 'One tap sends both and fixes your next bill', props: { label: 'Send readings', target: 'meter.electricity' } },
+      { id: 'note.estimate', component: 'note.explain', intent_class: 'feedback', tier: 'ambient', why: 'So you know why we are asking', props: { text: 'Your last two bills were estimated. A real reading now will correct the balance on the next one.' } },
+    ],
+    primary_action: { block_id: 'action.submit', label: 'Send readings' },
+  },
+  'priya:meter:done': {
+    intent: 'Give a reading for both meters',
+    frame: 'focus',
+    blocks: [
+      { id: 'status.readings', component: 'status.done', intent_class: 'feedback', tier: 'hero', why: 'Both readings are in and your next bill will use them', props: { title: 'Readings received', detail: 'Electricity 48610, gas 9990. Your next bill on 1 October will be based on these.' } },
+      { id: 'meter.electricity', component: 'meter.reading', intent_class: 'input', tier: 'primary', why: 'Kept here in case you want to correct it', props: { fuel: 'electricity' } },
+      { id: 'meter.gas', component: 'meter.reading', intent_class: 'input', tier: 'supporting', why: 'Kept here in case you want to correct it', props: { fuel: 'gas' } },
+    ],
+    primary_action: { block_id: 'status.readings', label: 'Done' },
+  },
+  'sam:meter': {
+    intent: 'Give a meter reading',
+    frame: 'focus',
+    blocks: [
+      { id: 'status.readings', component: 'status.done', intent_class: 'feedback', tier: 'hero', why: 'Your smart meters sent readings at 06:00 today', props: { title: 'Nothing to do', detail: 'Both meters reported at 06:00 this morning. Your bills are based on real readings, never estimates.' } },
+      { id: 'stats.readings', component: 'stat.row', intent_class: 'data-display', tier: 'supporting', why: 'The numbers, if you want to check them against the meter', props: { stats: [{ label: 'Electricity', value: '31877', unit: 'kWh' }, { label: 'Gas', value: '7410', unit: 'm³' }] } },
+      { id: 'nav.else', component: 'list.alternatives', intent_class: 'navigation', tier: 'ambient', why: 'People who come here usually wanted one of these', props: { items: [{ label: 'See what the EV will do to your bill', detail: 'Drive tariff, cheap overnight charging' }, { label: 'Check your roof for solar', detail: 'Three questions, we know the rest' }] } },
+    ],
+    primary_action: { block_id: 'status.readings', label: 'OK' },
+  },
+
+  // ---- solar ------------------------------------------------------------------------------
+  // Turn 1: we know nothing about the house. Ask the two things that decide whether to go on.
+  'sam:solar': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.q.tenure', component: 'question.single', intent_class: 'input', tier: 'hero', why: 'Panels are a roof decision, so first: whose roof is it', props: { question: 'Do you own your home, or rent it?', options: ['I own it', 'I rent'], answerKey: 'tenure' } },
+      { id: 'solar.q.type', component: 'question.single', intent_class: 'input', tier: 'primary', why: 'Roughly how much roof there is to work with', props: { question: 'What kind of home is it?', options: ['Detached', 'Semi-detached', 'Terrace', 'Bungalow', 'Flat'], answerKey: 'houseType' } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'supporting', why: 'The part we already know, so we will not ask it', props: { items: [{ label: 'Electricity use', value: '3,600 kWh a year, plus an EV from next month', source: 'meter' }, { label: 'Smart meter', value: 'Yes, so export payments work', source: 'meter' }] } },
+    ],
+    primary_action: { block_id: 'solar.q.tenure', label: 'Answer' },
+  },
+  // Turn 1b: tenure answered on its own. Keep asking, do not assume the house type.
+  'sam:solar:owner': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.q.type', component: 'question.single', intent_class: 'input', tier: 'hero', why: 'Roughly how much roof there is to work with', props: { question: 'What kind of home is it?', options: ['Detached', 'Semi-detached', 'Terrace', 'Bungalow', 'Flat'], answerKey: 'houseType' } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'primary', why: 'What we know so far', props: { items: [{ label: 'Home', value: 'You own it', source: 'you told us' }, { label: 'Electricity use', value: '3,600 kWh a year, plus an EV from next month', source: 'meter' }, { label: 'Smart meter', value: 'Yes, so export payments work', source: 'meter' }] } },
+    ],
+    primary_action: { block_id: 'solar.q.type', label: 'Answer' },
+  },
+  // Turn 2: owner of a house. Now the roof.
+  'sam:solar:roof': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.q.orientation', component: 'question.single', intent_class: 'input', tier: 'hero', why: 'Direction decides most of what the panels will make', props: { question: 'Which way does the main slope of your roof face?', options: ['South', 'South-east', 'South-west', 'East', 'West', 'North', 'Not sure'], answerKey: 'orientation' } },
+      { id: 'solar.q.shading', component: 'question.text', intent_class: 'input', tier: 'primary', why: 'Trees and chimneys are the thing we cannot see from here', props: { question: 'Is anything shading that roof?', placeholder: 'A big sycamore next door, a chimney, nothing at all…', answerKey: 'shading' } },
+      { id: 'solar.q.home', component: 'question.single', intent_class: 'input', tier: 'supporting', why: 'Changes how much of the power you use yourself', props: { question: 'Is someone usually home in the day?', options: ['Most days', 'Rarely'], answerKey: 'homeInDay' } },
+      { id: 'solar.photo', component: 'photo.upload', intent_class: 'input', tier: 'supporting', why: 'A photo of the front lets us show you the result', props: { prompt: 'Drop a photo of the front of your house', accept: 'house' } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'supporting', why: 'What you have told us so far', props: { items: [{ label: 'Home', value: 'Detached, you own it', source: 'you told us' }, { label: 'Electricity use', value: '3,600 kWh a year, plus an EV', source: 'meter' }] } },
+    ],
+    primary_action: { block_id: 'solar.q.orientation', label: 'Answer' },
+  },
+  // Turn 3: answers in, photo in. The result, house first.
+  'sam:solar:result': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.render', component: 'solar.render', intent_class: 'data-display', tier: 'hero', why: 'Your roof with twelve panels, from the photo you gave us', props: { caption: '12 panels on the south slope, 5.2 kWp' } },
+      { id: 'solar.numbers', component: 'solar.estimate', intent_class: 'data-display', tier: 'primary', why: 'Worked from your real usage, not an average household', props: { tenure: 'owner', houseType: 'detached', orientation: 'south', shading: 'none', homeInDay: true, batteryKwh: 0 } },
+      { id: 'solar.recommend', component: 'recommendation.card', intent_class: 'data-display', tier: 'supporting', why: 'Our honest read of the numbers', props: { headline: 'Worth doing, without a battery', reason: 'A south roof with nothing in the way is as good as UK roofs get. The EV makes a battery tempting, but the Drive tariff already gives you cheap overnight charging for nothing.', points: ['12 panels, 5.2 kWp', 'About 9 years to pay back', 'Sunlight export tariff from day one'] } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'supporting', why: 'What we used, in case any of it is wrong', props: { items: [{ label: 'Home', value: 'Detached, you own it', source: 'you told us' }, { label: 'Roof', value: 'South, nothing shading it', source: 'you told us' }, { label: 'Home in the day', value: 'Most days', source: 'you told us' }, { label: 'Electricity use', value: '3,600 kWh a year', source: 'meter' }] } },
+      { id: 'action.survey', component: 'action.cta', intent_class: 'action', tier: 'ambient', why: 'A 20 minute video survey confirms the design', props: { label: 'Book a video survey', secondary: 'Email me this instead' } },
+    ],
+    primary_action: { block_id: 'action.survey', label: 'Book a video survey' },
+  },
+  'sam:solar:battery': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.render', component: 'solar.render', intent_class: 'data-display', tier: 'hero', why: 'Your roof with twelve panels, from the photo you gave us', props: { caption: '12 panels on the south slope, 5.2 kWp' } },
+      { id: 'solar.numbers', component: 'solar.estimate', intent_class: 'data-display', tier: 'primary', why: 'Same roof, now with a 10 kWh battery', props: { tenure: 'owner', houseType: 'detached', orientation: 'south', shading: 'none', homeInDay: true, batteryKwh: 10 } },
+      { id: 'solar.recommend', component: 'recommendation.card', intent_class: 'data-display', tier: 'supporting', why: 'Our honest read of the numbers', props: { headline: 'The battery adds years to the payback', reason: 'You keep more of your own power, but £6,000 more up front takes the payback from about 9 years to about 14. If you want it for outages or independence, fine. For money, the panels alone win.', points: ['Self use goes from 45% to 80%', 'Saving rises about £150 a year', 'Payback about 14 years'] } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'supporting', why: 'What we used, in case any of it is wrong', props: { items: [{ label: 'Home', value: 'Detached, you own it', source: 'you told us' }, { label: 'Roof', value: 'South, nothing shading it', source: 'you told us' }, { label: 'Battery', value: '10 kWh', source: 'you told us' }] } },
+      { id: 'action.survey', component: 'action.cta', intent_class: 'action', tier: 'ambient', why: 'A 20 minute video survey confirms the design', props: { label: 'Book a video survey', secondary: 'Email me this instead' } },
+    ],
+    primary_action: { block_id: 'action.survey', label: 'Book a video survey' },
+  },
+  'priya:solar': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.q.tenure', component: 'question.single', intent_class: 'input', tier: 'hero', why: 'Panels are a roof decision, so first: whose roof is it', props: { question: 'Do you own your home, or rent it?', options: ['I own it', 'I rent'], answerKey: 'tenure' } },
+      { id: 'solar.q.type', component: 'question.single', intent_class: 'input', tier: 'primary', why: 'Roughly how much roof there is to work with', props: { question: 'What kind of home is it?', options: ['Detached', 'Semi-detached', 'Terrace', 'Bungalow', 'Flat'], answerKey: 'houseType' } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'supporting', why: 'The part we already know, so we will not ask it', props: { items: [{ label: 'Electricity use', value: '4,200 kWh a year', source: 'meter' }, { label: 'Smart meter', value: 'Not yet, a free install is step one for export payments', source: 'meter' }] } },
+    ],
+    primary_action: { block_id: 'solar.q.tenure', label: 'Answer' },
+  },
+
+  'sam:solar:rent': {
+    intent: 'Find out if solar makes sense for your home',
+    frame: 'focus',
+    blocks: [
+      { id: 'solar.recommend', component: 'recommendation.card', intent_class: 'data-display', tier: 'hero', why: 'Straight answer before you spend any more time on it', props: { headline: 'Not panels, not while you rent', reason: 'The roof is your landlord\'s call, so panels are off the table for now. Three things do work for you.' } },
+      { id: 'nav.instead', component: 'list.alternatives', intent_class: 'navigation', tier: 'primary', why: 'Each of these cuts your bill without touching the roof', props: { items: [{ label: 'Drive tariff', detail: 'Cheap overnight charging for the EV, about £480 a year off' }, { label: 'Plug-in balcony panel', detail: 'Legal since 2025, about £400, 200 to 300 kWh a year' }, { label: 'Ask your landlord', detail: 'We can send them a suitability check for the whole building' }] } },
+      { id: 'solar.assumptions', component: 'assumptions.list', intent_class: 'data-display', tier: 'supporting', why: 'What we based that on', props: { items: [{ label: 'Home', value: 'Rented', source: 'you told us' }, { label: 'Electricity use', value: '3,600 kWh a year', source: 'meter' }] } },
+    ],
+    primary_action: { block_id: 'nav.instead', label: 'See options' },
+  },
+
+  // ---- tariff -----------------------------------------------------------------------------
+  'sam:tariff': {
+    intent: 'Find a cheaper tariff for how you actually use energy',
+    frame: 'compare',
+    blocks: [
+      { id: 'tariff.options', component: 'tariff.compare', intent_class: 'data-display', tier: 'hero', why: 'Worked from your last 12 months plus the EV arriving next month', props: { tariffIds: ['drive', 'tracker', 'fixed-12'], highlight: 'drive' } },
+      { id: 'tariff.now', component: 'tariff.current', intent_class: 'data-display', tier: 'primary', why: 'Where you are today, so the saving means something', props: {} },
+      { id: 'note.caveat', component: 'note.explain', intent_class: 'feedback', tier: 'supporting', why: 'The saving depends on one habit', props: { text: 'Drive only wins if the car charges between midnight and 7am. Set the charger to do that once and forget it. If you charge in the day the saving drops to about £70.' } },
+      { id: 'action.switch', component: 'action.cta', intent_class: 'action', tier: 'supporting', why: 'No exit fee on Drive, so nothing to lose by trying it', props: { label: 'Switch to Drive', target: 'tariff.options', secondary: 'Remind me when the car arrives' } },
+    ],
+    primary_action: { block_id: 'action.switch', label: 'Switch to Drive' },
+  },
+  'sam:tariff:daycharge': {
+    intent: 'Find a cheaper tariff for how you actually use energy',
+    frame: 'compare',
+    blocks: [
+      { id: 'tariff.options', component: 'tariff.compare', intent_class: 'data-display', tier: 'hero', why: 'Recalculated with the car charging in the day', props: { tariffIds: ['drive', 'tracker', 'fixed-12'], highlight: 'tracker', offPeakShare: 0.15 } },
+      { id: 'tariff.now', component: 'tariff.current', intent_class: 'data-display', tier: 'primary', why: 'Where you are today, so the saving means something', props: {} },
+      { id: 'note.caveat', component: 'note.explain', intent_class: 'feedback', tier: 'supporting', why: 'What changed and why', props: { text: 'Without overnight charging Drive loses its edge and Tracker comes out ahead. Tracker follows the wholesale price, so some days cost more than the cap. If that worries you, Fixed 12 is the calm option.' } },
+      { id: 'action.switch', component: 'action.cta', intent_class: 'action', tier: 'supporting', why: 'No exit fee on Tracker either', props: { label: 'Switch to Tracker', target: 'tariff.options', secondary: 'Show me Fixed 12 instead' } },
+    ],
+    primary_action: { block_id: 'action.switch', label: 'Switch to Tracker' },
+  },
+  'priya:tariff': {
+    intent: 'Find a cheaper tariff for how you actually use energy',
+    frame: 'compare',
+    blocks: [
+      { id: 'tariff.options', component: 'tariff.compare', intent_class: 'data-display', tier: 'hero', why: 'Worked from your last 12 months of usage', props: { tariffIds: ['fixed-12', 'fixed-24'], highlight: 'fixed-12' } },
+      { id: 'tariff.now', component: 'tariff.current', intent_class: 'data-display', tier: 'primary', why: 'Where you are today', props: {} },
+      { id: 'note.caveat', component: 'note.explain', intent_class: 'feedback', tier: 'supporting', why: 'Why the two smart-meter tariffs are missing', props: { text: 'Tracker and Drive need a smart meter. Yours are traditional, so they are not on the list. A smart meter install is free and takes an hour, and it would also stop your bills being estimated.' } },
+      { id: 'action.switch', component: 'action.cta', intent_class: 'action', tier: 'supporting', why: 'Locks the rate for a year, £50 a fuel to leave', props: { label: 'Switch to Fixed 12', target: 'tariff.options', secondary: 'Book a smart meter first' } },
+    ],
+    primary_action: { block_id: 'action.switch', label: 'Switch to Fixed 12' },
+  },
+};
+
+// Keyword routing for fallback mode. Ordered: more specific first.
+export function pickFixture(personaId: string, message: string, prevKey?: string | null): string | null {
+  const m = message.toLowerCase();
+  const has = (...ws: string[]) => ws.some(w => m.includes(w));
+  const k = (s: string) => (FIXTURES[`${personaId}:${s}`] ? `${personaId}:${s}` : null);
+  const inFlow = (f: string) => !!prevKey?.startsWith(`${personaId}:${f}`);
+  if (inFlow('meter') && has('blurry', 'photo', 'picture')) return k('meter:photo');
+  if (inFlow('meter') && has('submitted', 'sent', 'done', 'here are')) return k('meter:done');
+  if (inFlow('solar') && has('i rent', 'renting', 'we rent')) return k('solar:rent') ?? k('solar');
+  if (inFlow('solar') && has('forget the battery', 'no battery', 'without the battery')) return k('solar:result');
+  if (inFlow('solar') && has('battery')) return k('solar:battery');
+  if (prevKey === `${personaId}:solar:roof` && has('photo', 'uploaded', 'shading', 'roof face', 'home in the day', 'most days', 'rarely', 'south', 'north', 'east', 'west', 'nothing', 'tree', 'chimney')) return k('solar:result') ?? k('solar:roof');
+  if ((prevKey === `${personaId}:solar` || prevKey === `${personaId}:solar:owner`) && has('detached', 'semi', 'terrace', 'bungalow', 'flat')) return k('solar:roof') ?? k('solar');
+  if (prevKey === `${personaId}:solar` && has('i own', 'we own', 'owner')) return k('solar:owner') ?? k('solar:roof') ?? k('solar');
+  if (inFlow('solar:result') || inFlow('solar:battery')) return prevKey ?? null;
+  if (inFlow('tariff') && has('will charge overnight', 'actually we will')) return k('tariff');
+  if (inFlow('tariff') && has('day', 'not overnight', "don't charge", 'do not charge')) return k('tariff:daycharge');
+  if (has('meter', 'reading')) return k('meter');
+  if (has('solar', 'panel', 'roof')) return k('solar');
+  if (has('tariff', 'cheaper', 'bill', 'deal', 'switch', 'save')) return k('tariff');
+  return null;
+}

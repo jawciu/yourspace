@@ -1,0 +1,11 @@
+{
+  "_note": "One logged-in homeowner. A house design service knows the customer's name and address from sign-up and nothing else about the house. Everything else is learned by asking, one question at a time.",
+  "personas": [
+    {
+      "id": "sam",
+      "name": "Sam Okafor",
+      "accountNumber": "H-20881-0042",
+      "address": "7 Cotham Grove, Bristol BS6 6AH"
+    }
+  ]
+}

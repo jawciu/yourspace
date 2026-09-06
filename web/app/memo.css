@@ -1,0 +1,5 @@
+/* memo panel: upload thumbnails */
+.memo-photos { display: flex; flex-wrap: wrap; gap: var(--s3); }
+.memo-photo { margin: 0; display: grid; gap: 4px; justify-items: center; width: 72px; }
+.memo-photo img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); display: block; background: var(--bg-2); }
+.memo-photo-cap { font-size: 12px; color: var(--ink-2); text-align: center; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -1,0 +1,78 @@
+{
+  "_note": "Fictional supplier tariffs, anchored to the Ofgem Oct-Dec 2026 price cap (elec 26.32p/kWh, gas 7.97p/kWh, SC 54.8p / 29.7p per day, direct debit averages ex-region). Prices in pence, ex VAT is NOT applied: treat as inc-VAT consumer prices for the demo. Brand name is a placeholder, rename freely.",
+  "brand": "VOLT (placeholder)",
+  "priceCapPeriod": "1 Oct 2026 to 31 Dec 2026",
+  "tariffs": [
+    {
+      "id": "standard-variable",
+      "name": "Standard Variable",
+      "type": "variable",
+      "termMonths": null,
+      "exitFeePerFuel": 0,
+      "electricity": { "unitRate": 26.32, "standingCharge": 54.8 },
+      "gas": { "unitRate": 7.97, "standingCharge": 29.7 },
+      "eligibility": "everyone",
+      "summary": "The default tariff, tracks the Ofgem price cap. No commitment, no exit fee, changes every three months."
+    },
+    {
+      "id": "fixed-12",
+      "name": "Fixed 12",
+      "type": "fixed",
+      "termMonths": 12,
+      "exitFeePerFuel": 50,
+      "electricity": { "unitRate": 25.05, "standingCharge": 54.8 },
+      "gas": { "unitRate": 7.58, "standingCharge": 29.7 },
+      "eligibility": "everyone",
+      "summary": "Unit rates locked for a year, about 5% under the cap. £50 per fuel to leave early."
+    },
+    {
+      "id": "fixed-24",
+      "name": "Fixed 24",
+      "type": "fixed",
+      "termMonths": 24,
+      "exitFeePerFuel": 75,
+      "electricity": { "unitRate": 25.80, "standingCharge": 54.8 },
+      "gas": { "unitRate": 7.80, "standingCharge": 29.7 },
+      "eligibility": "everyone",
+      "summary": "Two years of certainty, slightly dearer than Fixed 12. £75 per fuel to leave early."
+    },
+    {
+      "id": "drive",
+      "name": "Drive (EV off-peak)",
+      "type": "time-of-use",
+      "termMonths": 12,
+      "exitFeePerFuel": 0,
+      "electricity": {
+        "unitRate": 29.50,
+        "offPeakRate": 6.70,
+        "offPeakWindow": "00:00 to 07:00 every day",
+        "standingCharge": 54.8
+      },
+      "gas": { "unitRate": 7.97, "standingCharge": 29.7 },
+      "eligibility": "smart meter required, EV or home battery",
+      "summary": "Cheap electricity overnight for charging, dearer the rest of the day. Only wins if you can shift a third or more of your usage into the window."
+    },
+    {
+      "id": "sunlight",
+      "name": "Sunlight (solar export)",
+      "type": "export",
+      "termMonths": 12,
+      "exitFeePerFuel": 0,
+      "electricity": { "unitRate": 26.32, "standingCharge": 54.8, "exportRate": 16.5 },
+      "gas": { "unitRate": 7.97, "standingCharge": 29.7 },
+      "eligibility": "smart meter, MCS-certified solar installation",
+      "summary": "Standard rates for what you import, 16.5p for every kWh you export. Pairs with the solar journey."
+    },
+    {
+      "id": "tracker",
+      "name": "Tracker",
+      "type": "tracker",
+      "termMonths": 12,
+      "exitFeePerFuel": 0,
+      "electricity": { "unitRate": 23.90, "standingCharge": 54.8 },
+      "gas": { "unitRate": 7.20, "standingCharge": 29.7 },
+      "eligibility": "smart meter required",
+      "summary": "Follows the wholesale price daily. The rates shown are the modelled 12-month average; individual days can be far above the cap. For people who can stomach variance."
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+/* render waiting animation, written by agent
+   ------------------------------------------------------------------
+   The overlay sits on the customer's photo while the render generates
+   (30 to 90 s). Four layers, all hanging off .render-wait, no markup:
+     1. .render-wait          diagonal light sweep + breathing blur
+     2. .render-wait::before  pulsing accent dot before the caption
+     3. .render-wait::after   thin scan line, top to bottom every 3 s
+     4. .render-stage img     slow drift of the photo under the veil
+   Colours come from the tokens only. Reduced motion = static veil. */
+
+.render-wait {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  padding: var(--s4) var(--s5);
+  overflow: hidden;
+  isolation: isolate;
+  text-align: center;
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t1);
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 55%, transparent);
+  /* layer 1: sweeping highlight (3x wide, travels via background-position)
+     layer 2: the veil itself, ink into accent */
+  background-image:
+    linear-gradient(
+      112deg,
+      transparent 38%,
+      color-mix(in srgb, var(--bg) 6%, transparent) 46%,
+      color-mix(in srgb, var(--bg) 22%, transparent) 50%,
+      color-mix(in srgb, var(--bg) 6%, transparent) 54%,
+      transparent 62%
+    ),
+    linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--ink) 48%, transparent),
+      color-mix(in srgb, var(--accent) 58%, transparent)
+    );
+  background-size: 300% 100%, 100% 100%;
+  background-position: 100% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: opacity .6s;
+  animation:
+    rw-sweep 5.2s linear infinite,
+    rw-breathe 4.4s ease-in-out infinite;
+}
+
+/* 2. the pulsing dot: the "alive" signal before the caption */
+.render-wait::before {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow:
+    0 0 0 0 color-mix(in srgb, var(--bg) 35%, transparent),
+    0 0 14px 2px color-mix(in srgb, var(--accent) 70%, transparent);
+  animation: rw-pulse 1.6s ease-in-out infinite;
+}
+
+/* 3. the scan line: a thin bright line with a soft accent halo,
+      travelling top to bottom every 3 s, resting briefly at the ends */
+.render-wait::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6px;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--bg) 85%, transparent) 30%,
+    var(--bg) 50%,
+    color-mix(in srgb, var(--bg) 85%, transparent) 70%,
+    transparent
+  );
+  box-shadow:
+    0 0 10px 1px color-mix(in srgb, var(--bg) 40%, transparent),
+    0 6px 24px 6px color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: rw-scan 3s cubic-bezier(.45, 0, .55, 1) infinite;
+}
+
+/* 4. the photo under the veil breathes very slowly so it never reads
+      as a frozen frame. Gated on the overlay being shown (inline
+      opacity: 1 from the block) so the "Now" view stays untouched. */
+.render-stage:has(.render-wait[style*="opacity: 1"]) img {
+  animation: rw-drift 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes rw-sweep {
+  from { background-position: 100% 0, 0 0; }
+  to   { background-position: 0% 0, 0 0; }
+}
+
+@keyframes rw-breathe {
+  0%, 100% { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  50%      { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+}
+
+@keyframes rw-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--bg) 35%, transparent),
+      0 0 14px 2px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  50% {
+    transform: scale(1.18);
+    box-shadow:
+      0 0 0 9px transparent,
+      0 0 22px 4px color-mix(in srgb, var(--accent) 90%, transparent);
+  }
+}
+
+@keyframes rw-scan {
+  0%   { top: -6px; opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes rw-drift {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to   { transform: scale(1.035) translate3d(-0.6%, 0.4%, 0); }
+}
+
+/* Reduced motion: keep the veil, the dot and the caption; nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  .render-wait,
+  .render-wait::before,
+  .render-wait::after,
+  .render-stage:has(.render-wait[style*="opacity: 1"]) img {
+    animation: none;
+  }
+  .render-wait {
+    background-position: 50% 0, 0 0;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .render-wait::after { display: none; }
+  .render-stage:has(.render-wait[style*="opacity: 1"]) img { transform: none; will-change: auto; }
+}

@@ -1,0 +1,53 @@
+/* Small action buttons under a text answer box.
+   Dimensions from Figma node 3:47 (NomeM58WoksRgQbCPA99OR):
+   padding 4px 12px, font 14px / 600, line-height 16px, radius 12px, 1px border.
+   Rendered height: 16 + 8 + 2 = 26px. */
+
+.textq-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-next,
+.btn-skip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.btn-next {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-next:disabled {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-2);
+  cursor: default;
+}
+
+.btn-skip {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+
+.btn-skip:hover {
+  color: var(--ink);
+}

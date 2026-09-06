@@ -1,0 +1,15 @@
+/* ---- products.list: what to buy and who to book ---- */
+.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s5) var(--s4); }
+.tier-hero .products, .tier-primary .products { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.product { display: grid; gap: 6px; align-content: start; }
+.product-img { position: relative; aspect-ratio: 1 / 1; border-radius: var(--radius); background: var(--bg-2); overflow: hidden; }
+.product-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .6s ease; }
+.product-img img.product-img-in { opacity: 1; }
+.product-shimmer { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--ink) 6%, transparent) 50%, transparent 80%); background-size: 220% 100%; animation: product-shimmer 1.6s ease-in-out infinite; }
+@keyframes product-shimmer { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+.product-failed { position: absolute; inset: 0; display: grid; place-items: center; padding: var(--s3); text-align: center; color: var(--ink-2); font-size: var(--t0); }
+.product-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-top: 4px; }
+.product-name { font-size: var(--t1); font-weight: 600; line-height: 1.25; }
+.product-price { font-family: var(--font-display); font-weight: 700; font-size: var(--t1); letter-spacing: -0.01em; }
+.product-detail { color: var(--ink-2); font-size: var(--t0); line-height: 1.4; }
+@media (prefers-reduced-motion: reduce) { .product-shimmer { animation: none; } }
