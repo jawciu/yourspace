@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ds-structure.local/ui-plan.schema.json",
+  "title": "UIPlan",
+  "description": "The only thing the model is allowed to emit. Structure and intent, never appearance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["intent", "frame", "blocks", "primary_action"],
+  "properties": {
+    "intent": {
+      "type": "string",
+      "description": "The user's goal restated in their own terms. Forces the model to commit to a reading.",
+      "minLength": 3,
+      "maxLength": 140
+    },
+    "frame": {
+      "description": "Sticky outer shape. See spec/vocabulary.md.",
+      "enum": ["focus", "compare", "browse", "monitor"]
+    },
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/block" },
+      "allOf": [
+        {
+          "description": "M6: exactly one hero",
+          "contains": { "properties": { "tier": { "const": "hero" } }, "required": ["tier"] },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "description": "M7: at most one primary",
+          "contains": { "properties": { "tier": { "const": "primary" } }, "required": ["tier"] },
+          "maxContains": 1
+        },
+        {
+          "description": "tier caps: supporting",
+          "contains": { "properties": { "tier": { "const": "supporting" } }, "required": ["tier"] },
+          "maxContains": 3
+        },
+        {
+          "description": "tier caps: ambient",
+          "contains": { "properties": { "tier": { "const": "ambient" } }, "required": ["tier"] },
+          "maxContains": 2
+        }
+      ]
+    },
+    "primary_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["block_id", "label"],
+      "properties": {
+        "block_id": { "$ref": "#/$defs/blockId" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 32 }
+      }
+    },
+    "question": {
+      "type": "string",
+      "description": "J1. When unsure, ask one question here instead of rendering a menu of guesses.",
+      "maxLength": 140
+    }
+  },
+  "$defs": {
+    "blockId": {
+      "type": "string",
+      "description": "M14. Semantic and stable across turns. Never positional.",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$",
+      "maxLength": 48
+    },
+    "block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "component", "intent_class", "tier", "why"],
+      "properties": {
+        "id": { "$ref": "#/$defs/blockId" },
+        "component": {
+          "type": "string",
+          "description": "Must exist and be published in spec/vocabulary.md. Checked by validate.mjs.",
+          "maxLength": 48
+        },
+        "intent_class": {
+          "enum": ["action", "input", "navigation", "data-display", "feedback"]
+        },
+        "tier": {
+          "enum": ["hero", "primary", "supporting", "ambient"]
+        },
+        "why": {
+          "type": "string",
+          "description": "M9, J5. A reason in the user's terms, not a label. Shown to the user.",
+          "minLength": 8,
+          "maxLength": 80
+        },
+        "props": {
+          "type": "object",
+          "description": "M2. Content and behaviour only. Appearance keys are forbidden by pattern.",
+          "propertyNames": {
+            "pattern": "^(?!.*(?:colou?r|background|bg|font|size|scale|width|height|padding|margin|gap|radius|shadow|opacity|weight|align|classname|class|style|css|theme|variant|tw)).+$"
+          }
+        }
+      }
+    }
+  }
+}

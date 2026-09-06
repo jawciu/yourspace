@@ -1,0 +1,31 @@
+{
+  "intent": "Find a quiet flat near the Overground under 1800 a month",
+  "frame": "focus",
+  "blocks": [
+    {
+      "id": "results.shortlist",
+      "component": "listing.stack",
+      "intent_class": "data-display",
+      "tier": "hero",
+      "why": "Four places match everything you asked for",
+      "props": { "listingIds": ["a1", "b2", "c3", "d4"] }
+    },
+    {
+      "id": "filter.budget",
+      "component": "range.budget",
+      "intent_class": "input",
+      "tier": "primary",
+      "why": "You gave a ceiling, so this is the thing you will move first",
+      "props": { "max": 1800, "currency": "GBP" }
+    },
+    {
+      "id": "action.viewing",
+      "component": "action.book",
+      "intent_class": "action",
+      "tier": "supporting",
+      "why": "Two of these have viewings this week",
+      "props": { "target": "results.shortlist" }
+    }
+  ],
+  "primary_action": { "block_id": "action.viewing", "label": "Book a viewing" }
+}

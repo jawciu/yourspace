@@ -1,0 +1,10 @@
+{
+  "intent": "Find a quiet flat near the Overground under 1800 a month",
+  "frame": "focus",
+  "blocks": [
+    { "id": "results.shortlist", "component": "listing.stack", "intent_class": "data-display", "tier": "ambient", "why": "Fewer matches now that you tightened the budget" },
+    { "id": "filter.budget", "component": "range.budget", "intent_class": "input", "tier": "hero", "why": "You are still moving this, so it stays in front" },
+    { "id": "action.viewing", "component": "action.book", "intent_class": "action", "tier": "supporting", "why": "Two of these have viewings this week" }
+  ],
+  "primary_action": { "block_id": "action.viewing", "label": "Book a viewing" }
+}

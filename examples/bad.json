@@ -1,0 +1,13 @@
+{
+  "intent": "Find a flat",
+  "frame": "dashboard",
+  "blocks": [
+    { "id": "block_1", "component": "card", "intent_class": "data-display", "tier": "hero", "why": "Results", "props": { "backgroundColor": "#eee", "fontSize": 14 } },
+    { "id": "block_2", "component": "card", "intent_class": "data-display", "tier": "hero", "why": "More results here for you", "props": {} },
+    { "id": "block_3", "component": "card", "intent_class": "data-display", "tier": "primary", "why": "Nearby areas you might like", "props": {} },
+    { "id": "block_4", "component": "card", "intent_class": "data-display", "tier": "primary", "why": "Mortgage calculator, just in case", "props": {} },
+    { "id": "block_5", "component": "card", "intent_class": "data-display", "tier": "supporting", "why": "Recently viewed listings", "props": {} },
+    { "id": "block_6", "component": "card", "intent_class": "data-display", "tier": "supporting", "why": "Popular searches this week", "props": {} }
+  ],
+  "primary_action": { "block_id": "block_9", "label": "Go" }
+}
