@@ -9,8 +9,9 @@ designathon (generative UI / intent-based interfaces). Read `README.md`, then `R
 - Root: `node validate.mjs <plan.json>` validates a plan (dependency-free). Examples in `examples/`.
 - App: `cd web && npm run dev` (Next 16, React 19, Tailwind 4, motion, @anthropic-ai/sdk, zod).
   `npx tsc --noEmit` typechecks. Fixture check: see scratch script pattern in session log.
-- Root is not a git repo. `web/` has its own git repo, created by create-next-app (one initial
-  commit by the scaffolder, none by us). Caroline's rule: never commit or push unless she says.
+- Root is the git repo, pushed to **https://github.com/jawciu/yourspace** (private, `main`).
+  The old scaffold-only repo in `web/` was removed. `.playwright-mcp/` and `web/.env.local` are
+  ignored. Caroline's rule: never commit or push unless she says, no Co-Authored-By trailers.
 
 ## Layout
 
@@ -19,6 +20,8 @@ closed vocabulary (empty until domain chosen) · `spec/stability.md` diff-by-blo
 `DEMO.md` build order, kill shot, cut list.
 
 ## Decision Log
+
+- 2026-09-06 — Root (not `web/`) is the repo, so rules and app ship together. Private on GitHub.
 
 - 2026-09-03 — Model never generates appearance; only composition. Brand is a schema constraint.
 - 2026-09-03 — Stability (diff by block id, one tier of movement per turn, focus lock) is the
