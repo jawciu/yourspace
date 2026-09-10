@@ -264,3 +264,16 @@ installer. Verified live: solar run asks roof → roof type → heating → usag
 unchanged. Deployed 16:33, committed as 50a910b (prompt.ts only; page.tsx, Ctx.tsx,
 blocks/index.tsx from round seven are still uncommitted but already on prod). Untested: solar
 render turn with a real house photo; any third goal (extension, garden).
+
+### 2026-09-10 — README for GitHub
+Caroline asked for a proper README on the GitHub repo (she thought it was called "Myspace", it
+is **jawciu/yourspace**). Wrote `README.md` (what it is, the journey, the UIPlan idea with a JSON
+excerpt, run instructions, layout table, how the day went, Subplane credit) in her voice
+(sentence case, no em dashes, British spelling). Rewrote `web/README.md` (was still "Volt",
+energy supplier) as a file map. `web/.env.local.example` now lists OPENAI_API_KEY too.
+Screenshots in `docs/` (landing, question, plan) taken fresh from prod in her Chrome: the older
+`.playwright-mcp/` shots still show the Hearth brand. Full-page shot was stitched from three
+viewport captures with the sticky aside set to static first (Playwright MCP was locked by
+another session). Committed 6c66ef8 and pushed on her say-so; also set the GitHub repo
+description and homepage via `gh repo edit`. Still stale: PLAN.md, DESIGN-BRIEF.md and
+research/ describe the energy version (README now says so).
